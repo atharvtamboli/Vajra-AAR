@@ -1,4 +1,4 @@
-# ⚡ Vajra AAR
+# Vajra AAR
 
 **Vajra AAR** is a real-time tactical performance and **After Action Review (AAR)** dashboard that combines **computer vision, machine learning, Raspberry Pi video streaming, tactical gesture recognition, telemetry, mapping, audio monitoring, and voice feedback** into a unified interface.
 
@@ -6,24 +6,24 @@ The system detects predefined hand signals through a Raspberry Pi camera, proces
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
-* 🎥 **Real-time Raspberry Pi camera streaming**
-* 🖐️ **AI-powered tactical hand gesture recognition**
-* 🤖 **MediaPipe hand landmark detection**
-* 🧠 **Scikit-learn gesture classification**
-* 🔊 **Automatic voice feedback**
-* 🗺️ **Interactive tactical map**
-* 📊 **Real-time telemetry dashboard**
-* 🎙️ **Microphone/audio monitoring**
-* 📝 **After Action Review timeline**
-* 🔌 **REST API + WebSocket communication**
-* 📡 **Network-based Raspberry Pi integration**
-* 🖥️ **Browser-based tactical interface**
+*  **Real-time Raspberry Pi camera streaming**
+*  **AI-powered tactical hand gesture recognition**
+*  **MediaPipe hand landmark detection**
+*  **Scikit-learn gesture classification**
+*  **Automatic voice feedback**
+*  **Interactive tactical map**
+*  **Real-time telemetry dashboard**
+*  **Microphone/audio monitoring**
+*  **After Action Review timeline**
+*  **REST API + WebSocket communication**
+*  **Network-based Raspberry Pi integration**
+*  **Browser-based tactical interface**
 
 ---
 
-## 🖐️ Gesture Recognition
+##  Gesture Recognition
 
 The AI pipeline recognizes tactical hand signals such as:
 
