@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+opencv-python
+numpy
+mediapipe
+scikit-learn
+joblib
+requests

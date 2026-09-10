@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AAR Tactical Performance Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">AAR</div>
+        <div>
+          <div class="mission-label">AFTER ACTION REVIEW</div>
+          <div class="mission-id">TRAINING SESSION <span>DF-AAR-01</span></div>
+        </div>
+      </div>
+
+      <div class="top-status">
+        <div class="status-item"><span class="dot green"></span><div><small>SESSION</small><b>ACTIVE</b></div></div>
+        <div class="status-item"><span class="dot green"></span><div><small>GPS</small><b>SIMULATED</b></div></div>
+        <div class="status-item"><span class="dot green"></span><div><small>AUDIO</small><b>INPUT OK</b></div></div>
+        <div class="status-item"><span class="dot amber"></span><div><small>VIDEO</small><b id="videoStatus">STANDBY</b></div></div>
+      </div>
+
+      <div class="top-actions">
+        <button class="icon-btn" title="Notifications">✦</button>
+        <button class="icon-btn" title="Settings">⚙</button>
+        <div class="avatar">K</div>
+      </div>
+    </header>
+
+    <main class="dashboard">
+      <!-- LEFT: PERSONNEL -->
+      <section class="panel personnel">
+        <div class="panel-title"><span>SOLDIER VITALS</span><span class="tiny-badge">5 ACTIVE</span></div>
+        <div class="soldier-list" id="soldierList">
+          <div class="soldier-row"><div class="soldier-id">01</div><div><b>SOLDIER 01</b><small>ACTIVE · MOVING</small></div><div class="soldier-hr"><strong>84</strong><span>BPM</span></div><div class="vital-bar"><i style="width:76%"></i></div></div>
+          <div class="soldier-row"><div class="soldier-id">02</div><div><b>SOLDIER 02</b><small>ACTIVE · MOVING</small></div><div class="soldier-hr"><strong>91</strong><span>BPM</span></div><div class="vital-bar"><i style="width:83%"></i></div></div>
+          <div class="soldier-row"><div class="soldier-id">03</div><div><b>SOLDIER 03</b><small>ACTIVE · OBSERVE</small></div><div class="soldier-hr"><strong>78</strong><span>BPM</span></div><div class="vital-bar"><i style="width:68%"></i></div></div>
+          <div class="soldier-row"><div class="soldier-id">04</div><div><b>SOLDIER 04</b><small>ACTIVE · MOVING</small></div><div class="soldier-hr"><strong>88</strong><span>BPM</span></div><div class="vital-bar"><i style="width:80%"></i></div></div>
+          <div class="soldier-row"><div class="soldier-id">05</div><div><b>SOLDIER 05</b><small>ACTIVE · COVER</small></div><div class="soldier-hr"><strong>82</strong><span>BPM</span></div><div class="vital-bar"><i style="width:73%"></i></div></div>
+        </div>
+        <div class="readiness"><div class="readiness-head"><span>UNIT READINESS</span><b id="readinessValue">85%</b></div><div class="segments" id="readinessSegments"></div></div>
+        <div class="status-list">
+          <div><span class="dot green"></span> UNIT <b>NOMINAL</b></div>
+          <div><span class="dot green"></span> VITALS <b>5 / 5 ONLINE</b></div>
+          <div><span class="dot amber"></span> FATIGUE <b>MONITOR</b></div>
+        </div>
+        <div class="score-card"><div><small>TRAINING SCORE</small><strong id="scoreValue">87</strong><span>/100</span></div><div class="score-ring"><span>87%</span></div></div>
+      </section>
+
+      <!-- CENTER: MAP -->
+      <section class="panel map-panel">
+        <div class="panel-title">
+          <div><span>TACTICAL MAP</span><small>CLICK MAP TO PLACE A POINT</small></div>
+          <div class="view-buttons">
+            <button class="active" id="terrainBtn">MAP</button>
+            <button id="satBtn">SATELLITE</button>
+          </div>
+        </div>
+
+        <div class="map-wrap">
+          <div id="map"></div>
+          <div class="map-overlay top-left">
+            <div class="map-live"><span class="dot green"></span> TRACKING</div>
+            <div class="map-coord">KARGIL AREA · GPS READY</div>
+          </div>
+          <div class="map-overlay bottom-left">
+            <button class="map-tool active" data-type="incident">＋ INCIDENT</button>
+            <button class="map-tool" data-type="checkpoint">⌖ CHECKPOINT</button>
+            <button class="map-tool" data-type="objective">◇ OBJECTIVE</button>
+            <button class="map-tool" id="addParaBtn">✦ ADD PARA</button>
+          </div>
+        </div>
+
+        <div class="map-footer">
+          <div><small>MARKERS</small><b id="markerCount">1</b></div>
+          <div><small>FORCES</small><b id="forceCount">3</b></div>
+          <div><small>ROUTE</small><b>ACTIVE</b></div>
+          <button id="clearMarkers">CLEAR MARKERS</button>
+        </div>
+        <div class="force-strip">
+          <div class="force-strip-title">PARA FORCE TRACKING <span>SIMULATION</span></div>
+          <div id="forceList" class="force-list"></div>
+        </div>
+      </section>
+
+      <!-- RIGHT: ENVIRONMENT -->
+      <section class="panel environment">
+        <div class="panel-title"><span>ENVIRONMENT</span><span class="tiny-badge">SIM</span></div>
+
+        <div class="env-location">KARGIL AREA · LOCAL CONDITIONS</div>
+        <div class="env-grid">
+          <div class="env-card">
+            <small>WIND</small><strong>12.4</strong><span>km/h</span>
+            <div class="wind-arrow">↗</div>
+          </div>
+          <div class="env-card">
+            <small>GUST</small><strong>18.1</strong><span>km/h</span>
+          </div>
+          <div class="env-card">
+            <small>TEMP</small><strong>28.4</strong><span>°C</span>
+          </div>
+          <div class="env-card">
+            <small>HUMIDITY</small><strong>64</strong><span>%</span>
+          </div>
+        </div>
+
+        <div class="telemetry">
+          <div class="chart-head"><span>PERFORMANCE TELEMETRY</span><b>LIVE</b></div>
+          <canvas id="telemetryChart"></canvas>
+        </div>
+
+        <div class="gps-mini">
+          <div class="chart-head"><span>POSITION</span><b>GPS</b></div>
+          <div class="coord-line"><span>LATITUDE</span><strong id="lat">34.150000° N</strong></div>
+          <div class="coord-line"><span>LONGITUDE</span><strong id="lon">77.580000° E</strong></div>
+          <div class="coord-line"><span>SPEED</span><strong id="speed">4.2 km/h</strong></div>
+        </div>
+      </section>
+
+      <!-- VIDEO: NOW LEFT OF GPS/AUDIO -->
+      <section class="panel video-panel">
+        <div class="panel-title">
+          <div><span>LIVE VIDEO FEED</span><small>RASPBERRY PI / MOTION READY</small></div>
+          <span class="tiny-badge" id="feedBadge">STANDBY</span>
+        </div>
+
+        <div class="video-frame">
+          <div class="video-placeholder" id="videoPlaceholder">
+            <div class="camera-icon">◉</div>
+            <strong>VIDEO INPUT READY</strong>
+            <span>Enter the Raspberry Pi Motion HTTP stream below</span>
+          </div>
+          <img id="motionFeed" alt="Raspberry Pi Motion stream" />
+          <div class="video-hud">
+            <span><i class="rec-dot"></i> LIVE</span>
+            <span>CAM-01</span>
+            <span id="videoClock">00:00:00</span>
+          </div>
+          <button class="fullscreen-btn" id="fullscreenBtn">⛶</button>
+        </div>
+
+        <div class="stream-controls">
+          <input id="piHost" type="text" placeholder="Pi IP (e.g. 192.168.4.1)" />
+          <input id="piPort" type="text" placeholder="PORT" value="8081" />
+          <input id="streamUrl" type="text" placeholder="or paste full Motion URL" />
+          <button id="connectVideo">CONNECT</button>
+        </div>
+      </section>
+
+      <!-- GPS + AUDIO -->
+      <section class="panel gps-audio-panel">
+        <div class="gps-section">
+          <div class="panel-title"><span>GPS LOCATION</span><span class="tiny-badge">SIMULATED</span></div>
+          <div class="big-coords">
+            <div><small>LAT</small><strong id="latBig">34.150000° N</strong></div>
+            <div><small>LON</small><strong id="lonBig">77.580000° E</strong></div>
+          </div>
+          <div class="gps-stats">
+            <div><small>ALTITUDE</small><b>14 m</b></div>
+            <div><small>SPEED</small><b id="speedBig">4.2 km/h</b></div>
+            <div><small>DISTANCE</small><b id="distance">1.84 km</b></div>
+          </div>
+        </div>
+
+        <div class="audio-section">
+          <div class="panel-title"><span>AUDIO MONITOR</span><span class="tiny-badge">FILTERED</span></div>
+          <div class="audio-level"><span>INPUT LEVEL</span><div class="level-bar"><i id="levelBar"></i></div><b id="dbValue">-- dB</b></div>
+          <div class="audio-path"><div class="path-node">INPUT</div><span>→</span><div class="path-node active">FILTER</div><span>→</span><div class="path-node">DISPLAY</div></div>
+          <canvas id="waveform"></canvas>
+          <div class="audio-controls"><button id="startAudio">START AUDIO</button><label class="filter-toggle"><input id="filterToggle" type="checkbox" checked> FILTERED OUTPUT</label></div>
+          <div class="audio-bottom"><span id="audioState">NO AUDIO INPUT</span><span>WEB AUDIO</span><span>FILTER: ACTIVE</span></div>
+        </div>
+      </section>
+
+      <!-- EVENTS -->
+      <section class="panel events-panel">
+        <div class="panel-title"><span>TRAINING EVENTS</span><span class="tiny-badge">AAR TIMELINE</span></div>
+        <div class="events" id="events">
+          <div class="event"><time>14:03:12</time><span class="event-dot green"></span><div><b>Movement detected</b><small>Forward movement · 4.2 km/h</small></div></div>
+          <div class="event"><time>14:04:27</time><span class="event-dot"></span><div><b>Checkpoint crossed</b><small>Marked point CP-01</small></div></div>
+          <div class="event"><time>14:05:41</time><span class="event-dot amber"></span><div><b>Audio activity</b><small>Filtered voice detected</small></div></div>
+          <div class="event"><time>14:07:06</time><span class="event-dot"></span><div><b>Training phase</b><small>Observation / response</small></div></div>
+        </div>
+        <button class="add-event" id="addEvent">＋ ADD EVENT</button>
+      </section>
+    </main>
+  </div>
+
+<div id="tacticalSignHUD" style="position:fixed;right:24px;bottom:24px;z-index:9999;min-width:230px;padding:12px 16px;border:1px solid rgba(255,255,255,.18);background:rgba(8,12,18,.92);color:#fff;box-shadow:0 8px 28px rgba(0,0,0,.35)">
+  <div style="font-size:10px;letter-spacing:1.5px;opacity:.65">TACTICAL GESTURE</div>
+  <div id="tacticalSign" style="font-size:24px;font-weight:700;margin-top:4px">NO HAND</div>
+  <div id="tacticalConfidence" style="font-size:11px;opacity:.7;margin-top:2px">Confidence: 0%</div>
+</div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js"></script>
+
+
+
+</body>
+</html>
